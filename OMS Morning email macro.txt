@@ -1,0 +1,75 @@
+Sub MailItemContent2()
+    Dim olItem As Outlook.MailItem
+    Dim sText As String
+
+'Create RSP Dictionary
+    Set dictRSP = New Scripting.Dictionary
+    
+    dictRSP.Add "CENKOS", False
+    dictRSP.Add "CANTOR", False
+    dictRSP.Add "FLOW TRADERS", False
+    dictRSP.Add "SINGER", False
+    dictRSP.Add "INVESTEC", False
+    dictRSP.Add "PANMURE", False
+    dictRSP.Add "SHORE CAPITAL", False
+    dictRSP.Add "FINNCAP", False
+    dictRSP.Add "WH IRELAND", False
+    dictRSP.Add "BMO CAPITAL", False
+    dictRSP.Add "CANNACORD", False
+    dictRSP.Add "NUMIS", False
+    dictRSP.Add "JEFFRIES", False
+    dictRSP.Add "WINTERFLOODS", False
+    dictRSP.Add "PEEL HUNT", False
+    dictRSP.Add "ORIEL", False
+    dictRSP.Add "BERENBERG BANK", False
+    dictRSP.Add "LIBERUM", False
+
+'Read body of email to variable as a multi line string
+    Set olItem = ActiveExplorer.Selection.item(1)
+    sText = olItem.Body
+    subj = olItem.Subject
+    
+    If InStr(1, subj, "OMS - m") Then
+
+        If InStr(1, sText, "Info:LSE file import successfully completed") <> 0 Then
+            varLSE = MsgBox("LES Imported OK")
+        End If
+    
+     'split the body into lines
+        varLines = Split(sText, vbNewLine)
+        
+    'loop through the lines and check stuff
+    
+        x = 1
+        
+        For Each Line In varLines
+        
+            If Len(Line) < 16 Then
+        
+                For Each rsp In dictRSP
+                
+                    If dictRSP(rsp) = False Then
+                    
+                        If InStr(1, varLines(x + 1), "last message") <> 0 Then
+                            dictRSP(rsp) = True
+                        End If
+                
+                    End If
+                
+                Next
+            
+            End If
+            
+            x = x + 1
+            
+        Next
+        
+        For Each rsp In dictRSP
+            varNewLines = varNewLines + rsp & " Connected: " & dictRSP(rsp) & vbNewLine
+        Next
+        
+        msg = MsgBox(varNewLines)
+    
+    End If
+    
+End Sub
